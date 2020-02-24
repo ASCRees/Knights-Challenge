@@ -1,29 +1,24 @@
-# README #
+# README
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### What is this repository for?
 
-### What is this repository for? ###
+- This typescript script calculates the set of moves that would be required for a knight to move around the chess board
+- visiting each square only once.
+-
+-
+- Version 1.0
+-
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+### How do I get set up?
 
-### How do I get set up? ###
+- This can be run in the terminal window using node
+-
+- node knightschessmove.js
+-
+- The code assumes that the knight starts on square 0 and 0, bottome left of the board. Noe the chess board is zero based.
+-
+- Knightmove.txt shows an example of the output.
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+### Testing
 
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+-- This includes a number of tests that use the Jasmine framework. To run the Jasmine tests open the SpecRunner.html file in a browser.
