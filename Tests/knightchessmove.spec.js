@@ -224,6 +224,25 @@ describe('Test Knights Challenge - SetStartingMove', () => {
             reverseMove: 0
         }));
     });
+
+    it('Check next SetStartingMove throws an error -1,0', () => {
+
+        chess = new KnightsMove.ChessBoard(-1, -1);
+
+        let currentPosition = {
+            knightMove: 0,
+            currentMove: 0,
+            currLocationY: 0,
+            currLocationX: 0,
+            freeSquare: false,
+            reverseMove: 0
+        };
+
+        expect(function () {
+            chess.SetStartingMove();
+        }).toThrow();
+        //"Starting Positions must be 0 or greater"
+    });
 });
 
 describe('Test Knights Challenge - CheckPositionNotOccupied', () => {

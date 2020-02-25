@@ -13,10 +13,12 @@ namespace KnightsMove {
 	export class ChessBoard {
 		private StartingPositionX: number = 0;
 		private StartingPositionY: number = 0;
+		private MaxReversals: number = 0;
 
-		constructor(startingPositionX: number, startingPositionY: number) {
+		constructor(startingPositionX: number, startingPositionY: number, maxReversals: number) {
 			this.StartingPositionX = startingPositionX;
 			this.StartingPositionY = startingPositionY;
+			this.MaxReversals = maxReversals;
 		}
 
 		private defaultobj: IPositionCheck = {
@@ -101,7 +103,7 @@ namespace KnightsMove {
 			return returnVal;
 		}
 
-		private CalcNextMove(currentMove: number, tempCurrLocationX: number, tempCurrLocationY: number) {
+		private CalcNextMove(currentMove: number, tempCurrLocationX: number, tempCurrLocationY: number): { tempCurrLocationX: number; tempCurrLocationY: number; reverseMove: number } {
 			let reverseMove: number = 0;
 			switch (currentMove) {
 				case 1:
@@ -148,11 +150,60 @@ namespace KnightsMove {
 			return { tempCurrLocationX, tempCurrLocationY, reverseMove };
 		}
 
-		public MoveTheKnight() {
+		private MoveTheKnight(currentMove: number, knightMove: number, currentPosition: IPositionCheck): { startTime: number; totalMoves: number; reversingCount: number; error: string } {
 			let startTime: number = new Date().getTime();
 			let totalMoves: number = 1;
 			let reversingCount: number = 0;
 			let nextPosition: IPositionCheck;
+			let error: string = "";
+
+			try {
+				currentMove = 0;
+
+				while (knightMove < 64) {
+					nextPosition = undefined;
+
+					// Find the next vaialble position
+					while (nextPosition == undefined && currentMove < 8) {
+						currentMove++;
+						nextPosition = this.CheckPositionMove(currentMove, currentPosition.currLocationX, currentPosition.currLocationY);
+					}
+
+					totalMoves++;
+
+					// Determine if we have moved forward or need to move backwards.
+					if (nextPosition != undefined) {
+						// The piece has successfully moved so set the piece on the board.
+						nextPosition.knightMove = ++knightMove;
+						nextPosition.freeSquare = false;
+						this.chessboard[nextPosition.currLocationY][nextPosition.currLocationX] = nextPosition;
+						currentPosition = nextPosition;
+						currentMove = 0;
+					} else {
+						// Havent moved so we need to reverse.
+						this.chessboard[currentPosition.currLocationY][currentPosition.currLocationX] = this.defaultobj; // Blank out the current square as we are move back off it.
+						currentPosition = this.ReverseKnightPosition(currentPosition); // Go back to the previous position.
+						currentMove = currentPosition.currentMove = currentPosition.currentMove + 1; // Set the currentmove to one more than previous
+						reversingCount++;
+						knightMove--; // Decrement the number of knightmoves.
+
+						// Break if we have reversed x times. This is a safety feature to stop going forever
+						if (reversingCount === this.MaxReversals) {
+							throw new Error("Breaking on move " + knightMove.toString() + " reversingCount -" + reversingCount.toString());
+						}
+					}
+				}
+			} catch (e) {
+				error = e.message;
+			}
+
+			return { startTime, totalMoves, reversingCount, error };
+		}
+
+		public RunKnightMove() {
+			console.log("");
+			console.log("Starting Board");
+			console.log("");
 
 			// Set the Starting Position of the board.
 			let {
@@ -165,48 +216,24 @@ namespace KnightsMove {
 				currentPosition: IPositionCheck;
 			} = this.SetStartingMove();
 
-			console.log("");
-			console.log("Starting Board");
-			console.log("");
-
 			// Print the initial board with the piece on the initial starting point.
 			this.PrintBoard();
 
-			currentMove = 0;
+			let {
+				startTime,
+				totalMoves,
+				reversingCount,
+				error
+			}: {
+				startTime: number;
+				totalMoves: number;
+				reversingCount: number;
+				error: string;
+			} = this.MoveTheKnight(currentMove, knightMove, currentPosition);
 
-			while (knightMove < 64) {
-				nextPosition = undefined;
-
-				// Find the next vaialble position
-				while (nextPosition == undefined && currentMove < 8) {
-					currentMove++;
-					nextPosition = this.CheckPositionMove(currentMove, currentPosition.currLocationX, currentPosition.currLocationY);
-				}
-
-				totalMoves++;
-
-				// Determine if we have moved forward or need to move backwards.
-				if (nextPosition != undefined) {
-					// The piece has successfully moved so set the piece on the board.
-					nextPosition.knightMove = ++knightMove;
-					nextPosition.freeSquare = false;
-					this.chessboard[nextPosition.currLocationY][nextPosition.currLocationX] = nextPosition;
-					currentPosition = nextPosition;
-					currentMove = 0;
-				} else {
-					// Havent moved so we need to reverse.
-					this.chessboard[currentPosition.currLocationY][currentPosition.currLocationX] = this.defaultobj; // Blank out the current square as we are move back off it.
-					currentPosition = this.ReverseKnightPosition(currentPosition); // Go back to the previous position.
-					currentMove = currentPosition.currentMove = currentPosition.currentMove + 1; // Set the currentmove to one more than previous
-					reversingCount++;
-					knightMove--; // Decrement the number of knightmoves.
-
-					// Break if we have reversed 10 billion times. This is a safety feature to stop going forever
-					if (reversingCount === 10000000000) {
-						console.log("Breaking on move " + knightMove.toString() + " reversingCount -" + reversingCount.toString());
-						break;
-					}
-				}
+			if (error) {
+				console.log("");
+				console.log(error);
 			}
 
 			// Output the board as is.
@@ -227,14 +254,15 @@ namespace KnightsMove {
 
 let XPosition: number = 0;
 let YPosition: number = 0;
+let maxReversals: number = 1000000000;
 
 // Instantiate the ChessBoard class and pass in the starting position in the constructor using X and Y values indicating the position on the board
 // to start from. The board is zero based and so the first position of X and Y are both 0. Which is the bottom left
 
-let chess = new KnightsMove.ChessBoard(XPosition, YPosition);
+let chess = new KnightsMove.ChessBoard(XPosition, YPosition, maxReversals);
 
 // Move the knight starting at the starting position.
 // The knight may move back on itself and retry an alternative route. The code has a safety break in so that if it reverses one billion times
 // it will terminate.
 
-chess.MoveTheKnight();
+chess.RunKnightMove();
