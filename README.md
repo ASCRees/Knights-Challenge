@@ -21,3 +21,6 @@
 ### Testing
 
 - This includes a number of tests that use the Jasmine framework. To run the Jasmine tests open the SpecRunner.html file in a browser.
+
+![image](https://user-images.githubusercontent.com/28151071/77830217-eac5a380-711e-11ea-878b-8df2e338948d.png)
+
