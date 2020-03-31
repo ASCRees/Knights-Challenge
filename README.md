@@ -23,3 +23,5 @@ This includes a number of tests that use the Jasmine framework. To run the Jasmi
 
 ![image](https://user-images.githubusercontent.com/28151071/77830217-eac5a380-711e-11ea-878b-8df2e338948d.png)
 
+![image](https://user-images.githubusercontent.com/28151071/78035311-d7a21600-7360-11ea-9cb7-650921dbde19.png)
+
